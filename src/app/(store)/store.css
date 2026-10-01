@@ -1,0 +1,334 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* =========================================================================
+   OsmeKos storefront design tokens.
+   Reference: osmekos_brain/03_DESIGN_SYSTEM.md, 04_TYPOGRAPHY.md,
+              05_COLOR_AND_MATERIAL.md
+   ========================================================================= */
+
+@theme {
+  /* ---- colour: warm ivory -> ink, single gold accent -------------------- */
+  --color-cream: #f6f1e9;
+  --color-cream-2: #efe7db;
+  --color-sand: #e5d9c8;
+  --color-stone: #cfc1ac;
+  --color-paper: #fffdf9; /* raised surface; replaces pure white */
+
+  --color-gold: #c9a24e; /* material gold — decorative only */
+  --color-gold-2: #a6812c; /* large text only (>=24px) */
+  --color-gold-3: #7f5c21; /* AA on cream at small sizes */
+
+  --color-ink: #231f1a;
+  --color-ink-2: #3e3731;
+  --color-ink-3: #5a524a;
+  --color-muted: #6f655b; /* raised from #7b7168 -> 4.9:1 on cream */
+
+  --color-line: rgb(35 31 26 / 0.12);
+  --color-line-2: rgb(35 31 26 / 0.06);
+  --color-line-inv: rgb(246 241 233 / 0.14); /* rules on ink */
+  --color-danger: #8f2230;
+
+  /* ---- families --------------------------------------------------------- */
+  --font-display: var(--font-outfit), system-ui, sans-serif;
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+
+  /* ---- fluid type scale ------------------------------------------------- */
+  --text-d1: clamp(3.25rem, 1.2rem + 8.6vw, 8.5rem);
+  --text-d2: clamp(2.6rem, 1.45rem + 4.8vw, 5.5rem);
+  --text-d3: clamp(2.1rem, 1.45rem + 2.7vw, 3.75rem);
+  --text-d4: clamp(1.6rem, 1.25rem + 1.5vw, 2.5rem);
+  --text-lead: clamp(1.05rem, 0.98rem + 0.32vw, 1.3rem);
+  --text-cap: 0.78125rem;
+  --text-eyebrow: 0.6875rem;
+
+  /* ---- rhythm (plain custom props: use via var()) ------------------------ */
+  --space-section: clamp(5rem, 3.2rem + 7.5vw, 10rem);
+  --space-section-sm: clamp(3.5rem, 2.6rem + 3.8vw, 6rem);
+  --space-block: clamp(2rem, 1.5rem + 2.1vw, 3.5rem);
+  --space-gutter: clamp(1.25rem, 0.11rem + 4.86vw, 4rem);
+
+  /* ---- radius: semantic names so Tailwind's own scale stays intact ------ */
+  --radius-field: 0.5rem;
+  --radius-chip: 999px;
+  --radius-card: 1.25rem;
+  --radius-media: 2rem;
+  --radius-stage: 2.75rem;
+
+  /* ---- elevation: warm-tinted, light from upper left, positive Y only --- */
+  --shadow-rise: 0 2px 8px -4px rgb(35 31 26 / 0.1);
+  --shadow-card: 0 18px 40px -28px rgb(35 31 26 / 0.34);
+  --shadow-lift: 0 34px 70px -42px rgb(35 31 26 / 0.46);
+  --shadow-stage: 0 60px 120px -70px rgb(35 31 26 / 0.58);
+
+  /* ---- easing ----------------------------------------------------------- */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1); /* entrances */
+  --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1); /* symmetric */
+  --ease-exit: cubic-bezier(0.55, 0, 1, 0.45); /* departures */
+  --ease-glide: cubic-bezier(0.22, 0.61, 0.36, 1); /* UI micro-moves */
+
+  /* ---- duration --------------------------------------------------------- */
+  --dur-micro: 0.18s;
+  --dur-ui: 0.4s;
+  --dur-reveal: 1.1s;
+  --dur-scene: 1.6s;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+body {
+  font-variant-numeric: lining-nums;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: #fff;
+}
+
+@layer base {
+  /* One focus indicator for the whole storefront. :focus-visible keeps it off
+     mouse clicks. Gold-2 clears 3:1 on cream; the sand CTA card overrides to
+     gold-3 below. */
+  :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-gold-2);
+    outline-offset: 3px;
+    border-radius: var(--radius-field);
+  }
+
+  .on-sand :where(a, button, input, textarea, select, [tabindex]):focus-visible,
+  .on-paper :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline-color: var(--color-gold-3);
+  }
+
+  .on-ink :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline-color: var(--color-gold);
+  }
+
+  /* Tap feedback on touch, without the blue flash. */
+  :where(a, button) {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .container-x {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1480px;
+    padding-inline: var(--space-gutter);
+  }
+
+  .container-narrow {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 880px;
+    padding-inline: var(--space-gutter);
+  }
+
+  .container-wide {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1760px;
+    padding-inline: var(--space-gutter);
+  }
+
+  /* Section rhythm — replaces `py-24 md:py-40` repeated across the homepage. */
+  .section {
+    padding-block: var(--space-section);
+  }
+  .section-sm {
+    padding-block: var(--space-section-sm);
+  }
+
+  .eyebrow {
+    @apply font-sans text-eyebrow font-semibold uppercase tracking-[0.28em] text-gold-3;
+  }
+
+  .font-display,
+  .display {
+    font-variant-numeric: lining-nums proportional-nums;
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.028em;
+    line-height: 1;
+  }
+
+  /* Brand signature accents */
+  .display em {
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--color-gold-2);
+  }
+
+  /* Tabular figures for prices, percentages and counters. */
+  .num {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Raised warm surface — the replacement for every backdrop-blur card. */
+  .surface {
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-card);
+  }
+
+  .lead {
+    @apply text-lead leading-[1.7] text-ink-2;
+  }
+
+  .link-line {
+    position: relative;
+  }
+  .link-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.6s var(--ease-expo);
+  }
+  .link-line:hover::after,
+  .link-line:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Film grain. Sits under the nav (z-60) so it tints content, not UI. */
+  .grain {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    opacity: 0.045;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .split-line {
+    will-change: transform;
+  }
+
+  /* SplitText line masks clip at the line box, which cuts off deep serif
+     descenders (g, y, p). Grow the mask downward without moving the layout.
+     Fraunces has longer descenders than Playfair, hence 0.18em. */
+  .split-line-mask {
+    padding-bottom: 0.18em;
+    margin-bottom: -0.18em;
+  }
+
+  .marquee-track {
+    animation: marquee var(--marquee-duration, 40s) linear infinite;
+  }
+  .marquee-track.reverse {
+    animation-direction: reverse;
+  }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+
+  .prose-policy {
+    @apply max-w-[68ch] text-[15.5px] leading-[1.8] text-ink-2;
+  }
+  .prose-policy > * + * {
+    @apply mt-4;
+  }
+  .prose-policy ul {
+    @apply flex flex-col gap-2.5 pl-0;
+  }
+  .prose-policy li {
+    @apply relative pl-6;
+  }
+  .prose-policy li::before {
+    content: "";
+    @apply absolute left-0 top-[0.8em] h-1.5 w-1.5 rounded-full bg-gold;
+  }
+  .prose-policy strong {
+    @apply font-semibold text-ink;
+  }
+  .prose-policy a {
+    @apply text-ink underline decoration-gold decoration-1 underline-offset-4 transition-colors hover:text-gold-2;
+  }
+
+  /* 44px minimum touch target (WCAG 2.5.8). */
+  .stepper-btn {
+    @apply flex h-11 w-11 items-center justify-center text-ink transition-colors duration-200 hover:bg-ink hover:text-cream active:bg-gold active:text-ink disabled:pointer-events-none disabled:opacity-35;
+  }
+
+  .input {
+    @apply w-full rounded-field border border-ink/15 bg-paper/70 px-4 py-3.5 text-[15px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-muted focus:border-gold focus:shadow-[0_0_0_3px_rgb(201_162_78_/_0.18)];
+  }
+
+  /* Skip link — first tab stop, visible only when focused. */
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus-visible {
+    @apply not-sr-only fixed left-4 top-4 z-[300] rounded-chip bg-ink px-5 py-3 text-cap font-bold uppercase tracking-[0.16em] text-cream;
+  }
+}
+
+/* Radix Accordion height transition. Uses the variables Radix sets on the
+   content element, so no JS measurement is needed. */
+@layer components {
+  .acc-content[data-state="open"] {
+    animation: acc-down 0.5s var(--ease-expo);
+  }
+  .acc-content[data-state="closed"] {
+    animation: acc-up 0.4s var(--ease-exit);
+  }
+}
+
+@keyframes acc-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes acc-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .acc-content[data-state="open"],
+  .acc-content[data-state="closed"] {
+    animation: none;
+  }
+}
